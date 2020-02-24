@@ -1,6 +1,6 @@
 <template>
   <div class="keypad">
-    <v-radio-group style="grid-column: 2 / 4;" v-model="multiplicator" row>
+    <v-radio-group class="grid-auto" v-model="multiplicator" row>
       <v-radio label="Single" value @change="setMultiplikator('')"></v-radio>
       <v-radio label="Double" value="d" @change="setMultiplikator('d')"></v-radio>
       <v-radio label="Triple" value="t" @change="setMultiplikator('t')"></v-radio>
@@ -58,6 +58,11 @@ export default {
 
 <style lang="scss" scoped>
 @import "../styles/mixins.scss";
+
+.grid-auto{
+	grid-column: 1 / 4; 
+	margin: auto;
+}
 
 .keypad {
   height: 100%;

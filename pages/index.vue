@@ -2,7 +2,7 @@
   <div id="app">
     <div class="settings">
       <div class="settings__item">
-        <h2 class="h2">Most used Plays:</h2>
+        <h2>Most used Plays:</h2>
         <div class="settings__actions">
           <v-btn
             outlined
@@ -14,7 +14,7 @@
           >2 Spieler – 501 – Doubleout</v-btn>
         </div>
       </div>
-      <v-expansion-panels accordion>
+      <v-expansion-panels accordion class="mt-2">
         <v-expansion-panel>
           <v-expansion-panel-header expand-icon="mdi-menu-down">Erweitert</v-expansion-panel-header>
           <v-expansion-panel-content>

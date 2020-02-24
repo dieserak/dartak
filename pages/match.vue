@@ -8,7 +8,10 @@
         :class="{'scoreboard-item--disabled': turn !== player.id}"
       >
         <div>
-          <v-btn @click.native="removeLastShot()">Letzten Wurf entfernen <v-icon>mdi-delete</v-icon></v-btn>
+          <v-btn @click.native="removeLastShot()">
+            Letzten Wurf entfernen
+            <v-icon>mdi-delete</v-icon>
+          </v-btn>
 
           <div class="scoreboard-item__player">Spieler {{ `${player.id}` }}</div>
           <div class="scoreboard-item__score">{{ player.score }}</div>
@@ -22,15 +25,14 @@
           </div>
           <Checkout :checkout="player.score" />
         </div>
-        <v-text-field
-          :ref="`input${player.id}`"
-          v-model="player.shot"
-          placeholder="Geworfener Dart"
-          filled
-          :readonly="$_isMobile"
-          @keyup.enter="setNewScore()"
-        ></v-text-field>
       </div>
+      <v-text-field
+        v-model="shot"
+        placeholder="Geworfener Dart"
+        filled
+        :readonly="$_isMobile"
+        @keyup.enter="setNewScore()"
+      ></v-text-field>
       <Keypad @KeypadEnter="setNewScore()" @KeypadClicked="getValue" />
     </div>
     <vue-speech lang="de-DE" @onTranscriptionEnd="onSpeechEnd" />
@@ -50,7 +52,8 @@ export default {
     return {
       roundDartsThrown: 0,
       players: [],
-      turn: 0
+      turn: 0,
+      shot: 0
     };
   },
   computed: {
@@ -68,7 +71,7 @@ export default {
   },
   methods: {
     getValue(value) {
-      this.currentPlayer.shot = value;
+      this.shot = value;
     },
     //eslint-disable-next-line
     onSpeechEnd({ lastSentence, transcription }) {
@@ -142,9 +145,9 @@ export default {
     },
     setNewScore() {
       const player = this.currentPlayer;
-      const shot = player.shot;
+      const shot = this.shot;
 
-      if (this.checkScoreTooHigh(player.shot)) {
+      if (this.checkScoreTooHigh(shot)) {
         return;
       }
 
@@ -222,12 +225,6 @@ export default {
       } else {
         this.turn = 0;
       }
-
-      this.setFocusOnInput();
-    },
-    setFocusOnInput() {
-      const ref = `input${this.turn}`;
-      this.$refs[ref][0].focus();
     },
     //eslint-disable-next-line
     checkScore(player, oldScore) {
