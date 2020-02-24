@@ -8,7 +8,7 @@
         :class="{'scoreboard-item--disabled': turn !== player.id}"
       >
         <div>
-          <Button text="Letzten Wurf entfernen" remove @click.native="removeLastShot()" />
+          <v-btn @click.native="removeLastShot()">Letzten Wurf entfernen <v-icon>mdi-delete</v-icon></v-btn>
 
           <div class="scoreboard-item__player">Spieler {{ `${player.id}` }}</div>
           <div class="scoreboard-item__score">{{ player.score }}</div>
@@ -26,7 +26,7 @@
           :ref="`input${player.id}`"
           v-model="player.shot"
           placeholder="Geworfener Dart"
-          outlined
+          filled
           :readonly="$_isMobile"
           @keyup.enter="setNewScore()"
         ></v-text-field>
@@ -41,11 +41,10 @@
 import { detectingMobileMixin } from "../mixins/detectingMobileMixin";
 import { mapState } from "vuex";
 import Checkout from "../components/Checkout.vue";
-import Button from "../components/Button.vue";
 import Keypad from "../components/Keypad.vue";
 
 export default {
-  components: { Checkout, Button, Keypad },
+  components: { Checkout, Keypad },
   mixins: [detectingMobileMixin],
   data() {
     return {

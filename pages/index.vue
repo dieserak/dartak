@@ -49,15 +49,13 @@
 </template>
 
 <script>
-import Button from "../components/Button.vue";
 import IconArrow from "~/assets/arrow_drop_down-24px.svg?inline";
 import { mapMutations } from "vuex";
 
 export default {
   name: "App",
   components: {
-    IconArrow,
-    Button
+    IconArrow
   },
   data() {
     return {
