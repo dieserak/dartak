@@ -22,13 +22,14 @@
           </div>
           <Checkout :checkout="player.score" />
         </div>
-        <input
+        <v-text-field
           :ref="`input${player.id}`"
           v-model="player.shot"
+          placeholder="Geworfener Dart"
+          outlined
           :readonly="$_isMobile"
-          class="input input--full-width"
           @keyup.enter="setNewScore()"
-        />
+        ></v-text-field>
       </div>
       <Keypad @KeypadEnter="setNewScore()" @KeypadClicked="getValue" />
     </div>
