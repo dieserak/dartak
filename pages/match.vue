@@ -38,6 +38,7 @@
 
 <script>
 import { detectingMobileMixin } from "../mixins/detectingMobileMixin";
+import { mapState } from "vuex";
 import Checkout from "../components/Checkout.vue";
 import Button from "../components/Button.vue";
 import Keypad from "../components/Keypad.vue";
@@ -45,17 +46,6 @@ import Keypad from "../components/Keypad.vue";
 export default {
   components: { Checkout, Button, Keypad },
   mixins: [detectingMobileMixin],
-  props: {
-    score: {
-      type: Number
-    },
-    amountPlayers: {
-      type: Number
-    },
-    checkout: {
-      type: String
-    }
-  },
   data() {
     return {
       roundDartsThrown: 0,
@@ -64,6 +54,11 @@ export default {
     };
   },
   computed: {
+    ...mapState({
+      amountPlayers: state => state.amountPlayers,
+      score: state => state.score,
+      checkout: state => state.checkout
+    }),
     currentPlayer() {
       return this.players[this.turn];
     }

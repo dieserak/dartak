@@ -65,6 +65,7 @@
 <script>
 import Button from "../components/Button.vue";
 import IconArrow from "~/assets/arrow_drop_down-24px.svg?inline";
+import { mapMutations } from 'vuex'
 
 export default {
   name: "App",
@@ -74,24 +75,19 @@ export default {
   },
   data() {
     return {
-      moreSettingsVisible: false,
-      amountPlayers: 2,
-      score: 501,
-      checkout: "d"
+      moreSettingsVisible: false
     };
   },
   methods: {
     setAmountPlayers(amount) {
-      this.amountPlayers = amount;
+      this.$store.commit('setAmountPlayers', amount);
     },
     setScore(score) {
-      this.score = score;
+      this.$store.commit('setScore', score);
     },
     setCheckout(checkout) {
-      this.checkout = checkout;
-      this.$router.push({name: "match"});
-      // , params: { amountPlayers: this.amountPlayers, score: this.score, checkout: this.checkout }
-    // <!-- <Match v-else :amount-players="amountPlayers" :score="score" :checkout="checkout" /> -->
+      this.$store.commit('setCheckout', checkout);
+      this.$router.push({ name: "match" });
     }
   }
 };
