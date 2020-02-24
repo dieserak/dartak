@@ -5,18 +5,18 @@
       <v-radio label="Double" value="d" @change="setMultiplikator('d')"></v-radio>
       <v-radio label="Triple" value="t" @change="setMultiplikator('t')"></v-radio>
     </v-radio-group>
-    <span @click="addNum('1')">1</span>
-    <span @click="addNum('2')">2</span>
-    <span @click="addNum('3')">3</span>
-    <span @click="addNum('4')">4</span>
-    <span @click="addNum('5')">5</span>
-    <span @click="addNum('6')">6</span>
-    <span @click="addNum('7')">7</span>
-    <span @click="addNum('8')">8</span>
-    <span @click="addNum('9')">9</span>
-    <span @click="removeLast()">del</span>
-    <span @click="addNum('0')">0</span>
-    <span @click="enter()">-></span>
+    <v-btn @click="addNum('1')">1</v-btn>
+    <v-btn @click="addNum('2')">2</v-btn>
+    <v-btn @click="addNum('3')">3</v-btn>
+    <v-btn @click="addNum('4')">4</v-btn>
+    <v-btn @click="addNum('5')">5</v-btn>
+    <v-btn @click="addNum('6')">6</v-btn>
+    <v-btn @click="addNum('7')">7</v-btn>
+    <v-btn @click="addNum('8')">8</v-btn>
+    <v-btn @click="addNum('9')">9</v-btn>
+    <v-btn @click="removeLast()">del</v-btn>
+    <v-btn @click="addNum('0')">0</v-btn>
+    <v-btn @click="enter()">-></v-btn>
   </div>
 </template>
 
@@ -73,10 +73,10 @@ export default {
   border-left: 1px solid var(--divider-color);
   grid-auto-rows: 1fr;
   @include desktop {
-    grid-column: 1 / span 2;
+    grid-column: 1 / v-btn 2;
   }
 
-  span {
+  v-btn {
     cursor: pointer;
     min-height: 44px;
     border-top: 1px solid var(--divider-color);
