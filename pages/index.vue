@@ -1,339 +1,228 @@
 <template>
-  <div class="match">
-    <h1>test</h1>
-    <div class="scoreboard" :class="{'scoreboard--1': amountPlayers === 1}">
-      <div v-for="player in players" :key="player.id" class="scoreboard-item"
-        :class="{'scoreboard-item--disabled': turn !== player.id}">
-        <div>
-          <Button text="Letzten Wurf entfernen" remove @click.native="removeLastShot()" />
-
-          <div class="scoreboard-item__player">
-            Spieler {{ `${player.id}` }}
-          </div>
-          <div class="scoreboard-item__score">
-            {{ player.score }}
-          </div>
-          <div>
-            <div class="scoreboard-item__shot">
-              <span v-for="(lastShot, i) in player.history" :key="`item${i}`">
-                <span v-if="i % 3 === 0 && i !== 0">|</span>
-                {{ lastShot }}
-              </span>
-            </div>
-          </div>
-          <Checkout :checkout="player.score" />
+  <div id="app">
+    <div class="settings">
+      <div class="settings__item">
+        <h2 class="h2">Most used Plays:</h2>
+        <div class="settings__actions">
+          <Button
+            full
+            text="1 Spieler – 501 – Doubleout"
+            @click.native="setAmountPlayers(1); setScore(501); setCheckout('d'); goNext = true;"
+          />
+          <Button
+            full
+            text="2 Spieler – 501 – Doubleout"
+            @click.native="setAmountPlayers(2); setScore(501); setCheckout('d'); goNext = true;"
+          />
         </div>
-        <input :ref="`input${player.id}`" v-model="player.shot" :readonly="$_isMobile" class="input input--full-width"
-          @keyup.enter="setNewScore()">
       </div>
-      <Keypad @KeypadEnter="setNewScore()" @KeypadClicked="getValue" />
+      <div class="accordion" @click="moreSettingsVisible = !moreSettingsVisible">
+        Erweitert
+        <IconArrow
+          class="accordion__icon"
+          :class="{'accordion__icon--active': moreSettingsVisible}"
+        />
+      </div>
+      <div v-if="moreSettingsVisible" class="accordion__item">
+        <div class="settings__item">
+          Players:
+          <br />
+          <!-- have to be radiobuttons -->
+          <input type="radio" name="amountPlayers" @click="setAmountPlayers(1)" />
+          1
+          <input type="radio" name="amountPlayers" @click="setAmountPlayers(2)" />
+          2
+          <input type="radio" name="amountPlayers" @click="setAmountPlayers(3)" />
+          3
+          <input type="radio" name="amountPlayers" @click="setAmountPlayers(4)" />
+          4
+        </div>
+        <div class="settings__item">
+          X01
+          <br />
+          <input type="radio" name="x01" @click="setScore(301)" />
+          301
+          <input type="radio" name="x01" @click="setScore(501)" />
+          501
+          <input type="radio" name="x01" @click="setScore(701)" />
+          701
+        </div>
+        <div class="settings__item">
+          Checkout
+          <br />
+          <input type="radio" name="checkout" @click="setCheckout('s')" />
+          Singleout
+          <input type="radio" name="checkout" @click="setCheckout('d')" />
+          Doubleout
+          <input type="radio" name="checkout" @click="setCheckout('t')" />
+          Masterout
+        </div>
+      </div>
     </div>
-    <vue-speech lang="de-DE" @onTranscriptionEnd="onSpeechEnd" />
   </div>
 </template>
 
 <script>
-  import {
-    detectingMobileMixin
-  } from "../mixins/detectingMobileMixin";
-  import Checkout from "../components/Checkout.vue";
-  import Button from "../components/Button.vue";
-  import Keypad from "../components/Keypad.vue";
+import Button from "../components/Button.vue";
+import IconArrow from "~/assets/arrow_drop_down-24px.svg?inline";
 
-  export default {
-    components: {
-      Checkout,
-      Button,
-      Keypad
+export default {
+  name: "App",
+  components: {
+    IconArrow,
+    Button
+  },
+  data() {
+    return {
+      moreSettingsVisible: false,
+      amountPlayers: 2,
+      score: 501,
+      checkout: "d"
+    };
+  },
+  methods: {
+    setAmountPlayers(amount) {
+      this.amountPlayers = amount;
     },
-    mixins: [detectingMobileMixin],
-    props: {
-      score: {
-        type: Number
-      },
-      amountPlayers: {
-        type: Number
-      },
-      checkout: {
-        type: String
-      }
+    setScore(score) {
+      this.score = score;
     },
-    data() {
-      return {
-        roundDartsThrown: 0,
-        players: [],
-        turn: 0
-      };
-    },
-    computed: {
-      currentPlayer() {
-        return this.players[this.turn];
-      }
-    },
-    mounted() {
-      this.initMatch();
-    },
-    methods: {
-      getValue(value) {
-        this.currentPlayer.shot = value;
-      },
-      //eslint-disable-next-line
-      onSpeechEnd({
-        lastSentence,
-        transcription
-      }) {
-        let multiplicator = 1;
-        let convertedNumber = Number(lastSentence);
-        console.log(lastSentence);
-        console.log("transcription", transcription);
-
-        if (lastSentence.charAt(2) === "x") {
-          multiplicator = Number(lastSentence.charAt(0));
-          if (multiplicator > 3) {
-            return;
-          }
-          convertedNumber = Number(lastSentence.slice(4));
-          this.currentPlayer.shot = multiplicator * convertedNumber;
-        } else if (Number.isInteger(convertedNumber)) {
-          this.currentPlayer.shot = Number(lastSentence);
-        } else {
-          switch (lastSentence.toLowerCase()) {
-            case "löschen":
-              this.removeLastShot();
-              break;
-            case "ein":
-            case "eins":
-            case "rhein":
-            case "sein":
-              convertedNumber = 1;
-              break;
-            case "zwei":
-              convertedNumber = 2;
-              break;
-            case "drei":
-            case "sky":
-              convertedNumber = 3;
-              break;
-            case "tier":
-              convertedNumber = 4;
-              break;
-            case "schön":
-              convertedNumber = 5;
-              break;
-            case "sexy":
-            case "sex":
-              convertedNumber = 6;
-              break;
-            case "8 uhr":
-            case "ach":
-              convertedNumber = 8;
-              break;
-            case "9 uhr":
-              convertedNumber = 9;
-              break;
-            case "11 uhr":
-              convertedNumber = 11;
-              break;
-            case "13 uhr":
-              convertedNumber = 13;
-              break;
-            case "weiter":
-              this.fillWithNoScores();
-              break;
-          }
-
-          if (Number.isInteger(convertedNumber)) {
-            this.currentPlayer.shot = convertedNumber;
-          } else {
-            return;
-          }
-        }
-        this.setNewScore();
-      },
-      setNewScore() {
-        const player = this.currentPlayer;
-        const shot = player.shot;
-
-        if (this.checkScoreTooHigh(player.shot)) {
-          return;
-        }
-
-        player.history = [...player.history, this.calculateMultipicator(shot)];
-
-        const oldLocalScore = player.score;
-        player.score -= this.calculateMultipicator(shot);
-        player.roundDartsThrown++;
-        player.shot = "";
-
-        this.checkScore(player, oldLocalScore);
-        this.nextTurn(player);
-
-        setTimeout(() => {
-          const objDiv = document.getElementsByClassName("scoreboard-item__shot");
-          [...objDiv].forEach((button) => {
-            button.scrollLeft = button.scrollWidth + 1000;
-          });
-        }, 100);
-      },
-      removeLastShot() {
-        if (this.currentPlayer.roundDartsThrown > 0) {
-          const getLastShot = this.currentPlayer.history.pop();
-          this.currentPlayer.score += getLastShot;
-          this.currentPlayer.roundDartsThrown--;
-        }
-      },
-      checkScoreTooHigh(shot) {
-        //have to check multiplication
-        if (shot > 180) {
-          alert("too high - max 180 possible");
-          return true;
-        }
-        return false;
-      },
-      calculateMultipicator(shot) {
-        const multiplicator = shot.toString().charAt(0);
-
-        if (multiplicator === "d") {
-          //have to check multiplication
-          const d = Number(shot.slice(1)) * 2;
-          this.checkScoreTooHigh(d);
-          return d;
-        } else if (multiplicator === "t") {
-          //have to check multiplication
-          const t = Number(shot.slice(1)) * 3;
-          this.checkScoreTooHigh(t);
-          return t;
-        }
-        return Number(shot);
-      },
-      nextTurn(player) {
-        if (player.roundDartsThrown === 3) {
-          this.goToNextPlayer();
-        }
-      },
-      fillWithNoScores() {
-        if (this.currentPlayer.roundDartsThrown === 2) {
-          this.setNewScore();
-        } else if (this.currentPlayer.roundDartsThrown === 1) {
-          this.setNewScore();
-          this.setNewScore();
-        } else if (this.currentPlayer.roundDartsThrown === 0) {
-          this.setNewScore();
-          this.setNewScore();
-          this.setNewScore();
-        }
-      },
-      goToNextPlayer(fill) {
-        this.currentPlayer.roundDartsThrown = 0;
-        this.currentPlayer.shot = "";
-
-        if (this.players.length - 1 > this.turn) {
-          this.turn++;
-        } else {
-          this.turn = 0;
-        }
-
-        this.setFocusOnInput();
-      },
-      setFocusOnInput() {
-        const ref = `input${this.turn}`;
-        this.$refs[ref][0].focus();
-      },
-      //eslint-disable-next-line
-      checkScore(player, oldScore) {
-        const challengedScore = player.score;
-        if (challengedScore < 0) {
-          this.busted(player, oldScore);
-        }
-        if (this.checkout === "d") {
-          if (challengedScore < 2 && challengedScore > 0) {
-            this.busted(player, oldScore);
-          }
-        }
-        if (this.checkout === "t") {
-          if (challengedScore < 3 && challengedScore > 0) {
-            this.busted(player, oldScore);
-          }
-        } else if (challengedScore === 0) {
-          alert("Winner");
-          this.initMatch();
-        }
-      },
-      initMatch() {
-        this.players = [];
-        for (let i = 0; i < this.amountPlayers; i++) {
-          const playerObject = {
-            id: i,
-            score: this.score,
-            shot: "",
-            round: "",
-            roundDartsThrown: 0,
-            history: []
-          };
-          this.players = [...this.players, playerObject];
-        }
-      },
-      busted(player, oldScore) {
-        alert("überowrfen");
-        player.score = oldScore;
-        this.nextTurn(player);
-      }
+    setCheckout(checkout) {
+      this.checkout = checkout;
+      this.$router.push({name: "match"});
+      // , params: { amountPlayers: this.amountPlayers, score: this.score, checkout: this.checkout }
+    // <!-- <Match v-else :amount-players="amountPlayers" :score="score" :checkout="checkout" /> -->
     }
-  };
-
+  }
+};
 </script>
 
 <style lang="scss">
-  @import "../styles/mixins.scss";
+@import url("https://fonts.googleapis.com/css?family=Bebas+Neue|Lora|Nunito|PT+Sans|Playfair+Display&display=swap");
+@import "./styles/mixins.scss";
+@import "./styles/variables.scss";
 
-  .scoreboard-item {
-    padding: 20px;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    max-width: calc(100vw - 40px);
+:root {
+  /* spacing */
+  --xs: 4px;
+  --s: 8px;
+  --m: 16px;
+  --l: 24px;
+  --xl: 32px;
+  --xxl: 72px;
 
-    @include desktop {
-      max-width: calc(50vw - 40px);
-    }
+  /* color */
+  --color-primary: #455a64;
+  --color-primary-hover: #607d8b;
+  --primary-color-light: #cfd8dc;
+  --primary-color-text: #ffffff;
+  --accent-color: #03a9f4;
+  --primary-text-color: #2c3e50;
+  --secondary-text-color: #757575;
+  --divider-color: #bdbdbd;
 
-    &__player {
-      font-size: 20px;
-    }
+  /* text */
+  --text-base-size: 1em;
+  --text-scale-ratio: 1.2;
+  --text-xs: calc((1em / var(--text-scale-ratio)) / var(--text-scale-ratio));
+  --text-sm: calc(var(--text-xs) * var(--text-scale-ratio));
+  --text-md: calc(
+    var(--text-sm) * var(--text-scale-ratio) * var(--text-scale-ratio)
+  );
+  --text-lg: calc(var(--text-md) * var(--text-scale-ratio));
+  --text-xl: calc(var(--text-lg) * var(--text-scale-ratio));
+  --text-xxl: calc(var(--text-xl) * var(--text-scale-ratio));
+  --text-xxxl: calc(var(--text-xxl) * var(--text-scale-ratio));
+}
 
-    &__score {
-      font-size: 90px;
-    }
+::-webkit-scrollbar-thumb {
+  border-radius: 20px;
+  background: var(--divider-color);
+}
 
-    &--disabled {
-      pointer-events: none;
-      opacity: 0.2;
-    }
+::-webkit-scrollbar-track {
+  background: #fff;
+}
 
-    &__shot {
-      height: 60px;
-      font-size: 40px;
-      white-space: nowrap;
-      overflow: auto;
-    }
-  }
+::-webkit-scrollbar {
+  width: 4px;
+  height: 4px;
+}
 
-  .scoreboard {
+html,
+body,
+#app {
+  height: 100%;
+}
+html,
+body {
+  margin: 0;
+}
+
+#app,
+button {
+  font-family: "Nunito", Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  color: var(--primary-text-color);
+  font-size: 16px;
+}
+
+h1,
+h2,
+h3 {
+  font-family: "Playfair Display";
+}
+
+h2 {
+  font-size: 32px;
+}
+
+.settings__actions {
+  @include desktop {
     display: grid;
-    grid-template-columns: 1fr 1fr;
-    height: 100%;
+    grid-template-columns: 50% 50%;
+  }
+}
 
-    @media only screen and (max-width: 678px) {
-      grid-template-columns: 1fr;
-    }
+.u-v-centered {
+  display: flex;
+  align-items: center;
+}
 
-    &--1 {
-      grid-template-columns: 1fr;
+.u-mr-s {
+  margin-right: var(--s);
+}
+
+.settings {
+  margin: var(--m);
+  text-align: center;
+
+  &__item {
+    padding-bottom: var(--m);
+  }
+}
+
+.input {
+  height: 40px;
+  border-radius: 2px;
+  border: 1px solid #ccc;
+  font-size: 24px;
+  &--full-width {
+    width: 100%;
+  }
+}
+
+.accordion {
+  display: flex;
+  align-items: center;
+  margin: var(--m) 0;
+  cursor: pointer;
+  justify-content: center;
+  &__icon {
+    &--active {
+      transform: rotate(180deg);
     }
   }
-
-  .match {
-    height: 100%;
-  }
-
+}
 </style>

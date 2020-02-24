@@ -12,7 +12,7 @@
 </template>
 
 <script>
-import IconDelete from "../assets/delete-24px.svg";
+import IconDelete from "~/assets/delete-24px.svg?inline";
 
 export default {
 	name: "Button",

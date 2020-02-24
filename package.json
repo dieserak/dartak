@@ -12,6 +12,8 @@
   },
   "dependencies": {
     "@nuxtjs/pwa": "^3.0.0-0",
+    "@nuxtjs/svg": "^0.1.6",
+    "@vue/composition-api": "^0.4.0",
     "nuxt": "^2.0.0",
     "vue-speech": "^0.1.0"
   },
