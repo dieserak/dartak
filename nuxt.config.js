@@ -42,7 +42,6 @@ export default {
   ** Nuxt.js modules
   */
   modules: [
-    '@nuxtjs/vuetify',
     '@nuxtjs/svg',
     '@nuxtjs/pwa',
   ],
